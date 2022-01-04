@@ -20,7 +20,7 @@ def find_card_in_decision(decision, card_name):
 
 
 def get_minimum_coin_card(decision):
-    card_coins = [c.coins for c in decision.moves.card]
+    card_coins = [c.card.coins for c in decision.moves]
     return [np.argmin(card_coins)]
 
 

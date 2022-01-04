@@ -206,7 +206,9 @@ class EventLog(object):
                 print(event)
 
     def hide_for_player(self, player):
-        return [event.obfuscate(player).to_dict() for event in self.events]
+        # original implementation removed
+        # it takes an immense amount of time
+        return self.events
 
     def to_string(self):
         return dict_log_to_string(self.to_dict_log())

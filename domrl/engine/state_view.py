@@ -10,6 +10,7 @@ class PlayerView(object):
         self.buys = player.buys
         self.play_area = [card.name for card in player.play_area]
         self.phase = player.phase
+        self.domain_obj = player
 
         # Only visible to the player, not his opponents.
         self.discard_pile = [card.name for card in player.discard_pile] \

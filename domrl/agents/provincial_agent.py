@@ -15,6 +15,7 @@ action_priority = {
 "Village" : (116 - 17 + 1),
 "Cellar" : (116 - 38 + 1),
 "Witch" : (116 - 46 + 1),
+"Bandit" : (116 - 52 + 1),
 "Council Room" : (116 - 53 + 1),
 "Smithy" : (116 - 54 + 1),
 "Library" : (116 - 64 + 1),
@@ -107,9 +108,9 @@ def provincial_action_phase(decision):
     for i in range(1, len(decision.moves)):
         move = decision.moves[i]
         if hasattr(move, 'card') and move.card.name == "Moneylender" and hand_contains("Copper"):
-            cards_ordered.append((i, card_priority[move.card.name]))
+            cards_ordered.append((i, action_priority[move.card.name]))
         elif hasattr(move, 'card'):
-            cards_ordered.append((i, card_priority[move.card.name]))
+            cards_ordered.append((i, action_priority[move.card.name]))
 
     return [Sort_List_Of_Tuples(cards_ordered)[0][0]]
 ####################### END PHASE FUNCTIONS ######################
@@ -149,11 +150,11 @@ def provincial_reaction_chapel(decision, state_view):
 
     for i in range(1, len(decision.moves)):
         move = decision.moves[i]
-        if hasattr(move, 'card') and \
+        if hasattr(move, 'card') and ( \
             move.card.name == 'Chapel' or \
             (move.card.name == 'Estate' and state_view.supply_piles['Province'].qty > 2) or \
             move.card.name == 'Curse' or \
-            (trashCoppers and move.card.name == 'Copper'):
+            (trashCoppers and move.card.name == 'Copper')):
             return [i]
 
     return [0]
@@ -193,9 +194,9 @@ def provincial_reaction_throne_room(decision):
 def provincial_reaction_library(state_view):
     # no actions imply no point in taking action card
     if state_view.player.actions == 0:
-        return False
+        return [1]
     else:
-        return True # otherwise take the action card (independent of what it is)
+        return [0] # otherwise take the action card (independent of what it is)
 
 # reaction for card mine
 def provincial_reaction_mine(decision, state_view):
@@ -233,7 +234,7 @@ class ProvincialAgent(Agent):
 
         # chapel is played
         if decision.prompt == 'Trash up to 4 cards.':
-            return provincial_reaction_chapel(decision)
+            return provincial_reaction_chapel(decision, state_view)
 
         # moat is handeled by global trigger
 
@@ -254,7 +255,7 @@ class ProvincialAgent(Agent):
             return provincial_reaction_throne_room(decision)
 
         # library is played
-        if decision.prompt == 'Library draws':
+        if decision.prompt.startswith('Library draws'):
             return provincial_reaction_library(state_view)
 
         # mine is played
@@ -274,7 +275,7 @@ class ProvincialAgent(Agent):
             return provincial_buy_menu_big_money(decision, state_view, state_view.player.coins)
 
         if state_view.player.phase == TurnPhase.ACTION_PHASE:
-            provincial_reaction_chapel(decision)
+            provincial_reaction_chapel(decision, state_view)
             return provincial_action_phase(decision)
         ###################### END PHASES ########################
 
